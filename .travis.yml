@@ -1,42 +1,33 @@
 language: cpp
-sudo: false
+sudo: required
 dist: trusty
+services:
+  - docker
 matrix:
   include:
-  - os: linux
-    env: ARCH="i686"
-    compiler: g++-6 -m32
-    addons:
-      apt:
-        sources:
-        - ubuntu-toolchain-r-test
-        packages:
-        - gcc-6
-        - g++-6
-        - gcc-6-multilib
-        - g++-6-multilib
-        - make:i386
-  - os: linux
-    env: ARCH="x86_64"
-    compiler: g++-6 -m64
-    addons:
-      apt:
-        sources:
-        - ubuntu-toolchain-r-test
-        packages:
-        - gcc-6
-        - g++-6
-  - os: osx
-    env: ARCH="x86_64"
-    osx_image: xcode8
+    - os: linux
+      env: ARCH="i686" DOCKER_IMAGE="staticfloat/julia_workerbase:centos6_9-x86"
+    - os: linux
+      env: ARCH="x86_64" DOCKER_IMAGE="staticfloat/julia_workerbase:centos6_9-x64"
+    - os: osx
+      env: ARCH="x86_64"
+      osx_image: xcode8
 branches:
   only:
-  - master
+    - master
 notifications:
   email: false
+before_script:
+  - if [ "$(uname)" = "Linux" ]; then
+      docker pull $DOCKER_IMAGE;
+    fi
 script:
-- make
-- if [ -z "$(ls build/lib/libfftw*)" ]; then exit 1; fi
+  - if [ "$(uname)" = "Linux" ]; then
+      docker run --user=$(id -u):$(id -g) -ti -v $(pwd):/src -w /src $DOCKER_IMAGE make;
+    else
+      make;
+    fi
+  - if [ -z "$(ls build/lib/libfftw*)" ]; then exit 1; fi
 deploy:
   provider: releases
   api_key:
