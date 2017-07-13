@@ -3,45 +3,46 @@ sudo: false
 dist: trusty
 matrix:
   include:
-    - os: linux
-      env: ARCH="i686"
-      compiler: "g++-6 -m32"
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - gcc-6
-            - g++-6
-            - gcc-6-multilib
-            - g++-6-multilib
-            - make:i386
-    - os: linux
-      env: ARCH="x86_64"
-      compiler: "g++-6 -m64"
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - gcc-6
-            - g++-6
-    - os: osx
-      env: ARCH="x86_64"
-      osx_image: xcode8
+  - os: linux
+    env: ARCH="i686"
+    compiler: g++-6 -m32
+    addons:
+      apt:
+        sources:
+        - ubuntu-toolchain-r-test
+        packages:
+        - gcc-6
+        - g++-6
+        - gcc-6-multilib
+        - g++-6-multilib
+        - make:i386
+  - os: linux
+    env: ARCH="x86_64"
+    compiler: g++-6 -m64
+    addons:
+      apt:
+        sources:
+        - ubuntu-toolchain-r-test
+        packages:
+        - gcc-6
+        - g++-6
+  - os: osx
+    env: ARCH="x86_64"
+    osx_image: xcode8
 branches:
   only:
-    - master
+  - master
 notifications:
   email: false
 script:
-  - make
+- make
+- if [ -z "$(ls build/lib/libfftw*)" ]; then exit 1; fi
 deploy:
   provider: releases
   api_key:
-    secure: "<github oauth token>" # generate with `travis setup releases`
+    secure: Q6mEIsWWcSWx+LkPr8L73f46Iw0bdXWdi4ELMor/maHbpSEyStNmEx0POHKOKM4/VNketVXie4z7noeLGZURqqoYl28lSSZ1GEs9p2yf8YzhIAwuqkyyVv77pwt2mv8hMbiQBXB3TL8K2yFDzTiUf8QbHFa6Jxuf33Kg3t5q9zTl1Haf2R17ZrqUooeEZNlLJcRvp+PBaTddKxDsWrfxCMdm6mNMn1i3ziq1QVk+VbH5yfYw9guzKAh8DUBe5UzbhwlOdf4mcfzohSWsdzjxVwqhGPXRCCkptcewa/1YQuDlR/FFsUcAjX9MdxBoHuHlJDnz/rC5+8xlw30L1gWXVpjNtklfV4KBUPzfuTfV1QskSYGprtYlO3Q9MIePo7wbl9NkFKvieBXk/BOaW/WLEYsfpzch5zV3X/jSEquwKMr1j1P1YkR3j6InKUzuggm5oDOGS5VLuvArX1HnRcKMj/D89VtVDnD/2tZQYDZVEO88WIcuAAY4pfNjsqxukm5/wOnMzZRNpMSvWDmI+SSe7rNX8dNi7gfgsij1JjsaCp7S6VEn6fF8/HbKumgSjfGyBZjNlm2+WKWxhUw1M+aAs1D6sjtNuD5fr1ykMhxHefQl0+dA4i+fZJifv93ebsOy8W/JUkO3pFiCI1X0GQAfdhgZ44YeY18Esq8TuUPgIdI=
   file_glob: true
-  file: $HOME/build/lib/*
-  skip_cleanup: true
+  file: build/lib/*
   on:
+    repo: ararslan/fftw-builder
     tags: true
