@@ -23,17 +23,20 @@ endif
 
 FFTW_CONFIG += --enable-single
 
+.PHONY: default
+default: $(LIBDIR)/libfftw%
+
 $(SRCDIR)/fftw-$(FFTW_VERS).tar.gz:
 	-mkdir -p $(BUILDDIR) $(SRCDIR) $(LIBDIR) $(BINDIR)
-	curl -fkL --connect-timeout 15 -y 15 http://www.fftw.org/$(notdir $@) -O $@
+	curl -fkL --connect-timeout 15 -y 15 http://www.fftw.org/$(notdir $@) -o $@
 
 $(SRCDIR)/configure: $(SRCDIR)/fftw-$(FFTW_VERS).tar.gz
 	$(TAR) -C $(dir $@) --strip-components 1 -xf $<
 
 $(LIBDIR)/libfftw%: $(SRCDIR)/configure
 	# Try to configure with AVX support, if that fails then try again without
-	cd $(dir $<) && \
+	(cd $(dir $<) && \
 	    ./configure $(CONFIG) $(FFTW_CONFIG) --enable-avx || \
-	    ./configure $(CONFIG) $(FFTW_CONFIG)
+	    ./configure $(CONFIG) $(FFTW_CONFIG))
 	$(MAKE) -C $(dir $<)
 	$(MAKE) -C $(dir $<) install

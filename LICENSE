@@ -22,6 +22,8 @@ The code in this repository is licensed under the MIT license:
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
 
+Much of this code is derived from MIT-licensed code used by the Julia language.
+See https://julialang.org/license.
 
 Releases include binaries compiled from the FFTW library, which are licensed under
 version 2 of the GNU General Public License (GPL):
