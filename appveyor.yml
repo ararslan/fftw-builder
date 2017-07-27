@@ -18,7 +18,7 @@ cache:
 build_script:
   - set PATH=%PATH:C:\MinGW\bin;=%
   - set PATH=%PATH:C:\Program Files\Git\usr\bin;=%
-  - ps: install-cygwin.ps1
+  - ps: ./install-cygwin.ps1
   - C:\cygwin-%ARCH%\bin\make.exe
 
 # FROM AV DOCS:
