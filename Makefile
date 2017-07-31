@@ -1,7 +1,3 @@
-ifeq ($(OS),WINNT)
-CC := $(ARCH)-w64-mingw32-gcc
-endif
-
 BUILDDIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))/build
 SRCDIR := $(BUILDDIR)/src
 LIBDIR := $(BUILDDIR)/lib
@@ -28,6 +24,7 @@ FFTW_CONFIG += --enable-sse2 --enable-fma
 endif
 
 ifeq ($(OS),WINNT)
+CONFIG += CC="$(ARCH)-w64-mingw32-gcc"
 FFTW_CONFIG += --with-our-malloc --with-combined-threads
 ifneq ($(ARCH),x86_64)
 FFTW_CONFIG += --with-incoming-stack-boundary=2
