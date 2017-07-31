@@ -1,3 +1,7 @@
+ifeq ($(OS),WINNT)
+CC := $(ARCH)-w64-mingw32-gcc
+endif
+
 BUILDDIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))/build
 SRCDIR := $(BUILDDIR)/src
 LIBDIR := $(BUILDDIR)/lib
