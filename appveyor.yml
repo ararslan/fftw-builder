@@ -13,8 +13,14 @@ notifications:
 clone_depth: 1
 init:
   - git config --global core.autocrlf input
+cache:
+  - C:\cygdownloads
 build_script:
-  - C:\MinGW\bin\mingw32-make.exe
+  - set PATH=%PATH:C:\MinGW\bin;=%
+  - set PATH=%PATH:C:\Program Files\Git\usr\bin;=%
+  - ps: ./install-cygwin.ps1
+  - set PATH=C:\cygwin-%ARCH%\bin:%PATH%
+  - C:\cygwin-%ARCH%\bin\make.exe
 
 # FROM AV DOCS:
 # deploy:

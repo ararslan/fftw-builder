@@ -24,6 +24,7 @@ FFTW_CONFIG += --enable-sse2 --enable-fma
 endif
 
 ifeq ($(OS),WINNT)
+CONFIG += --host=$(ARCH)-w64-mingw32
 FFTW_CONFIG += --with-our-malloc --with-combined-threads
 ifneq ($(ARCH),x86_64)
 FFTW_CONFIG += --with-incoming-stack-boundary=2
