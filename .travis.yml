@@ -6,11 +6,16 @@ services:
 matrix:
   include:
     - os: linux
-      env: ARCH="i686" DOCKER_IMAGE="staticfloat/julia_workerbase:centos6_9-x86"
+      env: ARCH="i686" DOCKER_IMAGE="staticfloat/julia_workerbase:centos6_9-x86" JULIA_URL="https://julialangnightlies-s3.julialang.org/bin/linux/x86/julia-latest-linux32.tar.gz"
+      addons:
+        apt:
+          packages:
+            - libc6:i386
+            - zlib1g:i386
     - os: linux
-      env: ARCH="x86_64" DOCKER_IMAGE="staticfloat/julia_workerbase:centos6_9-x64"
+      env: ARCH="x86_64" DOCKER_IMAGE="staticfloat/julia_workerbase:centos6_9-x64" JULIA_URL="https://julialangnightlies-s3.julialang.org/bin/linux/x64/julia-latest-linux64.tar.gz"
     - os: osx
-      env: ARCH="x86_64"
+      env: ARCH="x86_64" JULIA_URL="https://julialangnightlies-s3.julialang.org/bin/osx/x64/julia-latest-osx.dmg"
       osx_image: xcode8
 branches:
   only:
@@ -21,13 +26,26 @@ before_script:
   - if [ "$(uname)" = "Linux" ]; then
       docker pull $DOCKER_IMAGE;
     fi
+  - export CURL_USER_AGENT="Travis-CI $(curl --version | head -n 1)"
+  - if [ "$(uname)" = "Linux" ]; then
+      mkdir -p ~/julia;
+      curl -A "${CURL_USER_AGENT}" -s -L --retry 7 "${JULIA_URL}" | tar -C ~/julia -x -z --strip-components=1 -f -;
+    fi
+  - if [ "$(uname)" = "Darwin" ]; then
+      curl -A "${CURL_USER_AGENT}" -s -L --retry 7 -o julia.dmg "${JULIA_URL}";
+      mkdir juliamnt;
+      hdiutil mount -readonly -mountpoint juliamnt julia.dmg;
+      cp -a juliamnt/*.app/Contents/Resources/julia ~/;
+    fi
+  - export PATH="${PATH}:${HOME}/julia/bin"
+  - julia -e 'versioninfo()'
 script:
   - if [ "$(uname)" = "Linux" ]; then
       docker run --user=$(id -u):$(id -g) -ti -v $(pwd):/src -w /src $DOCKER_IMAGE make;
     else
       make;
     fi
-  - if [ -z "$(ls build/lib/libfftw*)" ]; then exit 1; fi
+  - julia test.jl
 deploy:
   provider: releases
   api_key:
