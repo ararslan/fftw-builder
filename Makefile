@@ -3,7 +3,22 @@ SRCDIR := $(BUILDDIR)/src
 LIBDIR := $(BUILDDIR)/lib
 BINDIR := $(BUILDDIR)/bin
 
-default: $(LIBDIR)/libfftw%
+ifeq ($(OS),Windows_NT)
+SHLIB_EXT := dll
+SUFFIX := -3
+else
+SUFFIX := _threads
+ifeq ($(shell uname),Darwin)
+SHLIB_EXT := dylib
+else
+SHLIB_EXT := so
+endif
+endif
+
+TARGET_single := libfftw3f$(SUFFIX).$(SHLIB_EXT)
+TARGET_double := libfftw3$(SUFFIX).$(SHLIB_EXT)
+
+default: $(LIBDIR)/$(TARGET_single) $(LIBDIR)/$(TARGET_double)
 
 # Define directory-creation rule for many directories we'll need
 define dir_rule
@@ -23,14 +38,16 @@ ifeq ($(ARCH),x86_64)
 FFTW_CONFIG += --enable-sse2 --enable-fma
 endif
 
-ifeq ($(OS),WINNT)
+ifeq ($(OS),Windows_NT)
+CONFIG += --host=$(ARCH)-w64-mingw32
 FFTW_CONFIG += --with-our-malloc --with-combined-threads
 ifneq ($(ARCH),x86_64)
 FFTW_CONFIG += --with-incoming-stack-boundary=2
 endif
 endif
 
-FFTW_CONFIG += --enable-single
+FFTW_ENABLE_single := --enable-single
+FFTW_ENABLE_double :=
 
 .PHONY: default
 
@@ -40,10 +57,16 @@ $(SRCDIR)/fftw-$(FFTW_VERS).tar.gz: | $(SRCDIR)
 $(SRCDIR)/configure: $(SRCDIR)/fftw-$(FFTW_VERS).tar.gz
 	$(TAR) -C $(dir $@) --strip-components 1 -xf $<
 
-$(LIBDIR)/libfftw%: $(SRCDIR)/configure | $(LIBDIR) $(BINDIR)
-	# Try to configure with AVX support, if that fails then try again without
-	(cd $(dir $<) && \
-	    ./configure $(CONFIG) $(FFTW_CONFIG) --enable-avx || \
-	    ./configure $(CONFIG) $(FFTW_CONFIG))
-	$(MAKE) -C $(dir $<)
-	$(MAKE) -C $(dir $<) install
+define FFTW_BUILD
+$$(LIBDIR)/$$(TARGET_$1): $$(SRCDIR)/configure | $$(LIBDIR) $$(BINDIR)
+	(cd $$(dir $$<) && \
+	    ./configure $$(CONFIG) $$(FFTW_CONFIG) $$(FFTW_ENABLE_$1) --enable-avx || \
+	    ./configure $$(CONFIG) $$(FFTW_CONFIG) $$(FFTW_ENABLE_$1))
+	$(MAKE) -C $$(dir $$<)
+	$(MAKE) -C $$(dir $$<) install
+ifeq ($(OS),Windows_NT)
+	mv "$$(BINDIR)/$$(TARGET_$1)" "$$(LIBDIR)/$$(TARGET_$1)"
+endif
+endef
+
+$(foreach prec,single double,$(eval $(call FFTW_BUILD,$(prec))))

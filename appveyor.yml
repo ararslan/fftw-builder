@@ -1,20 +1,40 @@
 environment:
   matrix:
    - ARCH: "i686"
+     JULIA_URL: "https://julialangnightlies-s3.julialang.org/bin/winnt/x86/julia-latest-win32.exe"
    - ARCH: "x86_64"
+     JULIA_URL: "https://julialangnightlies-s3.julialang.org/bin/winnt/x64/julia-latest-win64.exe"
 branches:
   only:
     - master
+skip_commits:
+  message: /\[av skip\]/
 notifications:
   - provider: Email
     on_build_success: false
     on_build_failure: false
     on_build_status_changed: false
-clone_depth: 1
+shallow_clone: true
+clone_depth: 5
 init:
   - git config --global core.autocrlf input
+  - ps: "[System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12"
+install:
+  - appveyor DownloadFile https://cygwin.com/setup-x86_64.exe -FileName C:\projects\cygwin-setup-x86_64.exe
+  - C:\projects\cygwin-setup-x86_64.exe -q -g -P make,mingw64-i686-gcc-core,mingw64-x86_64-gcc-core
+  - appveyor DownloadFile %JULIA_URL% -FileName C:\projects\julia-binary.exe
+  - set PATH="C:\Program Files\7-Zip"
 build_script:
-  - C:\MinGW\bin\mingw32-make.exe
+  - C:\cygwin64\bin\sh -lc "make -C $(cygpath $APPVEYOR_BUILD_FOLDER)"
+# after_build:
+#   - 7z a <built binaries>
+before_test:
+  - C:\projects\julia-binary.exe /S /D=C:\projects\julia
+  - C:\projects\julia\bin\julia -e "versioninfo()"
+test_script:
+  - C:\projects\julia\bin\julia test.jl
+# artifacts:
+#   - path: <the stuff>
 
 # FROM AV DOCS:
 # deploy:
