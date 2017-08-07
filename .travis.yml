@@ -6,13 +6,6 @@ services:
 matrix:
   include:
     - os: linux
-      env: ARCH="i686" DOCKER_IMAGE="staticfloat/julia_workerbase:centos6_9-x86" JULIA_URL="https://julialangnightlies-s3.julialang.org/bin/linux/x86/julia-latest-linux32.tar.gz"
-      addons:
-        apt:
-          packages:
-            - libc6:i386
-            - zlib1g:i386
-    - os: linux
       env: ARCH="x86_64" DOCKER_IMAGE="staticfloat/julia_workerbase:centos6_9-x64" JULIA_URL="https://julialangnightlies-s3.julialang.org/bin/linux/x64/julia-latest-linux64.tar.gz"
     - os: osx
       env: ARCH="x86_64" JULIA_URL="https://julialangnightlies-s3.julialang.org/bin/osx/x64/julia-latest-osx.dmg"

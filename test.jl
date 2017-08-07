@@ -4,7 +4,8 @@ if Sys.iswindows()
     builddir = joinpath(ENV["APPVEYOR_BUILD_FOLDER"], "build")
     suffix = "-3." * Libdl.dlext
 else
-    builddir = joinpath(ENV["TRAVIS_BUILD_DIR"], "build")
+    env = Sys.WORD_SIZE == 32 ? "CIRCLE_WORKING_DIRECTORY" : "TRAVIS_BUILD_DIR"
+    builddir = joinpath(expanduser(ENV[env]), "build")
     suffix = "_threads." * Libdl.dlext
 end
 
