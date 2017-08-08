@@ -5,30 +5,20 @@ jobs:
       - image: staticfloat/julia_workerbase:centos6_9-x86
         environment:
           ARCH: i686
+          JULIA_URL: "https://julialangnightlies-s3.julialang.org/bin/linux/x86/julia-latest-linux32.tar.gz"
     steps:
       - checkout
-      - run: make
-    store_artifacts:
-      path: ~/project/build/lib
-  test:
-    docker:
-      - image: staticfloat/centos-i386:centos6
-    steps:
-      - checkout
-      - run: yum update -y && yum install -y tar
       - run:
-          name: Install x86 nightly Julia
+          name: Install x86 Julia nightly
           command: |
             mkdir -p ~/julia
-            curl -sLO --retry 7 "https://julialangnightlies-s3.julialang.org/bin/linux/x86/julia-latest-linux32.tar.gz"
-            tar -C ~/julia -x -z --strip-components=1 -f julia-latest-linux32.tar.gz
-      - run: ~/julia/bin/julia -e 'versioninfo()'
-      - run: ~/julia/bin/julia test.jl
-workflows:
-  version: 2
-  build_and_test:
-    jobs:
-      - build
-      - test:
-          requires:
-            - build
+            curl -sL "${JULIA_URL}" | tar -C ~/julia -x -z --strip-components=1 -f -
+            ~/julia/bin/julia -e 'versioninfo()'
+      - run:
+          name: Build FFTW
+          command: make
+      - run:
+          name: Test
+          command: ~/julia/bin/julia test.jl
+    store_artifacts:
+      path: ~/project/build/lib
