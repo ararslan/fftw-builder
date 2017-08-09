@@ -11,8 +11,9 @@ jobs:
       - run:
           name: Build FFTW
           command: make
+      - run: cp -R build/lib /tmp
       - persist_to_workspace:
-          root: build
+          root: /tmp
           paths:
             - lib
   test:
@@ -20,7 +21,7 @@ jobs:
       - image: circleci/python:3
     steps:
       - attach_workspace:
-          at: build/lib
+          at: /tmp/lib
       - checkout
       - run:
           name: Install x86 Julia nightly
@@ -36,11 +37,11 @@ jobs:
       - image: circleci/python:3
     steps:
       - attach_workspace:
-          at: build/lib
+          at: /tmp/lib
       - checkout
       - run:
           name: Compress binaries
-          command: ls -p build/lib | grep -v / | tar -cvf libfftw-$(cat VERSION)-linux32.tar.gz
+          command: ls -p /tmp/lib | grep -v / | tar -cvf libfftw-$(cat VERSION)-linux32.tar.gz
       - run:
           name: Upload to GitHub
           command: ./.circleci/github-upload.sh ./libfftw-$(cat VERSION)-linux.tar.gz
