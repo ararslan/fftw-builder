@@ -9,16 +9,54 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Build FFTW
+          command: make
+      - persist_to_workspace:
+          root: build
+          paths:
+            - lib
+  test:
+    docker:
+      - image: staticfloat/centos-i386:centos6
+    steps:
+      - attach_workspace:
+          at: build/lib
+      - checkout
+      - run: yum update -y && yum install -y tar
+      - run:
           name: Install x86 Julia nightly
           command: |
             mkdir -p ~/julia
             curl -sL "${JULIA_URL}" | tar -C ~/julia -x -z --strip-components=1 -f -
             ~/julia/bin/julia -e 'versioninfo()'
       - run:
-          name: Build FFTW
-          command: make
-      - run:
-          name: Test
+          name: Run tests
           command: ~/julia/bin/julia test.jl
-    store_artifacts:
-      path: ~/project/build/lib
+  deploy:
+    steps:
+      - attach_workspace:
+          at: build/lib
+      - checkout
+      - run:
+          name: Compress binaries
+          command: ls -p build/lib | grep -v / | tar -cvf libfftw-$(cat VERSION)-linux32.tar.gz
+      - run:
+          name: Upload to GitHub
+          command: ./.circleci/github-upload.sh ./libfftw-$(cat VERSION)-linux.tar.gz
+workflows:
+  version: 2
+  build-test-deploy:
+    jobs:
+      - build
+      - test:
+          requires:
+            - build
+      - deploy:
+          requires:
+            - build
+            - test
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              ignore: /.*/
