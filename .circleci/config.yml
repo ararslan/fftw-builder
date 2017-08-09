@@ -33,10 +33,13 @@ jobs:
           name: Run tests
           command: ~/julia/bin/julia test.jl
   deploy:
+    docker:
+      - image: staticfloat/centos-i386:centos6
     steps:
       - attach_workspace:
           at: build/lib
       - checkout
+      - run: yum update -y && yum install -y tar
       - run:
           name: Compress binaries
           command: ls -p build/lib | grep -v / | tar -cvf libfftw-$(cat VERSION)-linux32.tar.gz
