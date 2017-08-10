@@ -36,15 +36,3 @@ test_script:
   - C:\projects\julia\bin\julia test.jl
 artifacts:
   - path: libfftw-*.zip
-#deploy:
-#  release: libfftw
-#  description: 'libfftw3 for Windows'
-#  provider: GitHub
-#  auth_token:
-#    secure: <your encrypted token> # your encrypted token from GitHub
-#  artifact: /.*\.zip/              # upload all zip files to release assets
-#  draft: false
-#  prerelease: false
-#  on:
-#    branch: master                 # release from master branch only
-#    appveyor_repo_tag: true        # deploy on tag push only

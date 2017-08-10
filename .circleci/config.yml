@@ -43,10 +43,13 @@ jobs:
       - checkout
       - run:
           name: Compress binaries
-          command: ls -p /tmp/lib | grep -v / | tar -cvf libfftw-$(cat VERSION)-linux32.tar.gz
-      - run:
-          name: Upload to GitHub
-          command: ./.circleci/github-upload.sh ./libfftw-$(cat VERSION)-linux.tar.gz
+          command: |
+            TARBALL="libfftw-$(cat VERSION)-linux-i686.tar.gz"
+            mkdir -p /tmp/zip
+            ls -p /tmp/lib | grep -v / | tar -cvf $TARBALL
+            mv $TARBALL /tmp/zip
+      - store_artifacts:
+          path: /tmp/zip
 workflows:
   version: 2
   build-test-deploy:
@@ -62,3 +65,5 @@ workflows:
           filters:
             tags:
               only: /.*/
+            branches:
+              only: master
