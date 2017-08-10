@@ -36,7 +36,7 @@ jobs:
             mkdir -p ~/julia
             curl -sL "${JULIA_URL}" | tar -C ~/julia -x -z --strip-components=1 -f -
             ~/julia/bin/julia -e 'versioninfo()'
-      - run: mkdir build && cp -R /tmp/lib build # test code assumes this location
+      - run: mkdir -p build/lib && cp /tmp/lib/* build/lib # test code assumes this location
       - run:
           name: Run tests
           command: ~/julia/bin/julia test.jl

@@ -9,7 +9,6 @@ else
     suffix = "_threads." * Libdl.dlext
 end
 
-bindir = joinpath(builddir, "bin")
 libdir = joinpath(builddir, "lib")
 
 const libfftw = joinpath(libdir, "libfftw3$suffix")
@@ -18,8 +17,6 @@ const libfftwf = joinpath(libdir, "libfftw3f$suffix")
 # For debugging
 println("=====\nFull contents of build/lib:")
 foreach(println, readdir(libdir))
-println("=====\nFull contents of build/bin:")
-foreach(println, readdir(bindir))
 println("=====\nLooking for:\n", libfftw, "\n", libfftwf)
 
 @testset "things exist" begin
