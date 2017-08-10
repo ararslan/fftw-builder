@@ -24,12 +24,6 @@ jobs:
       - attach_workspace:
           at: /tmp
       - checkout
-#      - run:
-#          name: Get 32-bit system libraries
-#          command: |
-#            sudo dpkg --add-architecture i386
-#            sudo apt-get update -y
-#            sudo apt-get install -y libc6:i386 zlib1g:i386
       - run:
           name: Install x86 Julia nightly
           command: |
@@ -68,5 +62,3 @@ workflows:
           filters:
             tags:
               only: /.*/
-            branches:
-              ignore: /.*/

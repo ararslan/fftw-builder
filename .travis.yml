@@ -10,9 +10,9 @@ matrix:
     - os: osx
       env: ARCH="x86_64" JULIA_URL="https://julialangnightlies-s3.julialang.org/bin/osx/x64/julia-latest-osx.dmg"
       osx_image: xcode8
-branches:
-  only:
-    - master
+#branches:
+#  only:
+#    - master
 notifications:
   email: false
 before_script:
@@ -39,12 +39,13 @@ script:
       make;
     fi
   - julia test.jl
+  - ls -p build/lib | grep -v / | tar -cvf libfftw-$(cat VERSION)-$TRAVIS_OS_NAME-$ARCH.tar.gz
 deploy:
   provider: releases
   api_key:
     secure: Q6mEIsWWcSWx+LkPr8L73f46Iw0bdXWdi4ELMor/maHbpSEyStNmEx0POHKOKM4/VNketVXie4z7noeLGZURqqoYl28lSSZ1GEs9p2yf8YzhIAwuqkyyVv77pwt2mv8hMbiQBXB3TL8K2yFDzTiUf8QbHFa6Jxuf33Kg3t5q9zTl1Haf2R17ZrqUooeEZNlLJcRvp+PBaTddKxDsWrfxCMdm6mNMn1i3ziq1QVk+VbH5yfYw9guzKAh8DUBe5UzbhwlOdf4mcfzohSWsdzjxVwqhGPXRCCkptcewa/1YQuDlR/FFsUcAjX9MdxBoHuHlJDnz/rC5+8xlw30L1gWXVpjNtklfV4KBUPzfuTfV1QskSYGprtYlO3Q9MIePo7wbl9NkFKvieBXk/BOaW/WLEYsfpzch5zV3X/jSEquwKMr1j1P1YkR3j6InKUzuggm5oDOGS5VLuvArX1HnRcKMj/D89VtVDnD/2tZQYDZVEO88WIcuAAY4pfNjsqxukm5/wOnMzZRNpMSvWDmI+SSe7rNX8dNi7gfgsij1JjsaCp7S6VEn6fF8/HbKumgSjfGyBZjNlm2+WKWxhUw1M+aAs1D6sjtNuD5fr1ykMhxHefQl0+dA4i+fZJifv93ebsOy8W/JUkO3pFiCI1X0GQAfdhgZ44YeY18Esq8TuUPgIdI=
   file_glob: true
-  file: build/lib/*
+  file: libfftw-*.tar.gz
   on:
     repo: ararslan/fftw-builder
     tags: true
