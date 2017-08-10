@@ -17,19 +17,19 @@ jobs:
             - lib
   test:
     docker:
-      - image: circleci/python:3
+      - image: staticfloat/julia_workerbase:centos6_9-x86
         environment:
           JULIA_URL: "https://julialangnightlies-s3.julialang.org/bin/linux/x86/julia-latest-linux32.tar.gz"
     steps:
       - attach_workspace:
           at: /tmp
       - checkout
-      - run:
-          name: Get 32-bit system libraries
-          command: |
-            sudo dpkg --add-architecture i386
-            sudo apt-get update -y
-            sudo apt-get install -y libc6:i386 zlib1g:i386
+#      - run:
+#          name: Get 32-bit system libraries
+#          command: |
+#            sudo dpkg --add-architecture i386
+#            sudo apt-get update -y
+#            sudo apt-get install -y libc6:i386 zlib1g:i386
       - run:
           name: Install x86 Julia nightly
           command: |
