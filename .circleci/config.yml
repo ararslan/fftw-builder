@@ -24,7 +24,7 @@ jobs:
       - attach_workspace:
           at: /tmp/lib
       - checkout
-      - run: apt-get update -y && apt-get install -y libc6:i386 zlib1g:i386
+      - run: sudo apt-get update -y && sudo apt-get install -y libc6:i386 zlib1g:i386
       - run:
           name: Install x86 Julia nightly
           command: |
