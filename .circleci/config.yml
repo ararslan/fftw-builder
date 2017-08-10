@@ -22,7 +22,7 @@ jobs:
           JULIA_URL: "https://julialangnightlies-s3.julialang.org/bin/linux/x86/julia-latest-linux32.tar.gz"
     steps:
       - attach_workspace:
-          at: /tmp/lib
+          at: /tmp
       - checkout
       - run:
           name: Get 32-bit system libraries
@@ -45,7 +45,7 @@ jobs:
       - image: circleci/python:3
     steps:
       - attach_workspace:
-          at: /tmp/lib
+          at: /tmp
       - checkout
       - run:
           name: Compress binaries
