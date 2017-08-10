@@ -39,7 +39,7 @@ script:
       make;
     fi
   - julia test.jl
-  - ls -p build/lib | grep -v / | tar -cvf libfftw-$(cat VERSION)-$TRAVIS_OS_NAME-$ARCH.tar.gz
+  - ls -p $TRAVIS_BUILD_DIR/build/lib | grep -v / | tar -cvf libfftw-$(cat VERSION)-$TRAVIS_OS_NAME-$ARCH.tar.gz
 deploy:
   provider: releases
   api_key:
