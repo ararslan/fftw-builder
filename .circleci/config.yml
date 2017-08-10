@@ -1,0 +1,72 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: staticfloat/julia_workerbase:centos6_9-x86
+        environment:
+          ARCH: i686
+    steps:
+      - checkout
+      - run:
+          name: Build FFTW
+          command: make
+      - run: cp -R build/lib /tmp
+      - persist_to_workspace:
+          root: /tmp
+          paths:
+            - lib
+  test:
+    docker:
+      - image: staticfloat/julia_workerbase:centos6_9-x86
+        environment:
+          JULIA_URL: "https://julialangnightlies-s3.julialang.org/bin/linux/x86/julia-latest-linux32.tar.gz"
+    steps:
+      - attach_workspace:
+          at: /tmp
+      - checkout
+#      - run:
+#          name: Get 32-bit system libraries
+#          command: |
+#            sudo dpkg --add-architecture i386
+#            sudo apt-get update -y
+#            sudo apt-get install -y libc6:i386 zlib1g:i386
+      - run:
+          name: Install x86 Julia nightly
+          command: |
+            mkdir -p ~/julia
+            curl -sL "${JULIA_URL}" | tar -C ~/julia -x -z --strip-components=1 -f -
+            ~/julia/bin/julia -e 'versioninfo()'
+      - run: mkdir -p build/lib && cp /tmp/lib/*.* build/lib # test code assumes this location
+      - run:
+          name: Run tests
+          command: ~/julia/bin/julia test.jl
+  deploy:
+    docker:
+      - image: circleci/python:3
+    steps:
+      - attach_workspace:
+          at: /tmp
+      - checkout
+      - run:
+          name: Compress binaries
+          command: ls -p /tmp/lib | grep -v / | tar -cvf libfftw-$(cat VERSION)-linux32.tar.gz
+      - run:
+          name: Upload to GitHub
+          command: ./.circleci/github-upload.sh ./libfftw-$(cat VERSION)-linux.tar.gz
+workflows:
+  version: 2
+  build-test-deploy:
+    jobs:
+      - build
+      - test:
+          requires:
+            - build
+      - deploy:
+          requires:
+            - build
+            - test
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              ignore: /.*/
