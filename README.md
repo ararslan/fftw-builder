@@ -8,3 +8,11 @@ and are thus built in a Julia-centric manner.
 
 At this point, this repository should _not_ be considered production-ready.
 If a tag containing binaries exists, DO NOT USE THEM as they may be literal garbage.
+
+Who doesn't love status badges?
+
+| OS  | Arch | Status |
+| :-- | :--: | :----: |
+| Linux, macOS | x86-64 | [![Travis](https://travis-ci.org/ararslan/fftw-builder.svg?branch=master)](https://travis-ci.org/ararslan/fftw-builder) |
+| Linux | i686 | [![CircleCI](https://circleci.com/gh/ararslan/fftw-builder/tree/master.svg?style=svg)](https://circleci.com/gh/ararslan/fftw-builder/tree/master) |
+| Windows | i686, x86-64 | [![AppVeyor](https://ci.appveyor.com/api/projects/status/6fbcccap8rnwxn6d/branch/master?svg=true)](https://ci.appveyor.com/project/ararslan/fftw-builder/branch/master) |
