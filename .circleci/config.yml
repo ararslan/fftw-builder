@@ -11,6 +11,15 @@ jobs:
           name: Build FFTW
           command: make
       - run: cp -R build/lib /tmp
+      - run:
+          name: Compress binaries
+          command: |
+            TARBALL="libfftw-$(cat VERSION)-linux-i686.tar.gz"
+            mkdir -p /tmp/zip
+            cd build/lib
+            ls -p | grep -v / | xargs tar -cvf /tmp/zip/$TARBALL
+      - store_artifacts:
+          path: /tmp/zip
       - persist_to_workspace:
           root: /tmp
           paths:
@@ -24,12 +33,6 @@ jobs:
       - attach_workspace:
           at: /tmp
       - checkout
-#      - run:
-#          name: Get 32-bit system libraries
-#          command: |
-#            sudo dpkg --add-architecture i386
-#            sudo apt-get update -y
-#            sudo apt-get install -y libc6:i386 zlib1g:i386
       - run:
           name: Install x86 Julia nightly
           command: |
@@ -40,19 +43,6 @@ jobs:
       - run:
           name: Run tests
           command: ~/julia/bin/julia test.jl
-  deploy:
-    docker:
-      - image: circleci/python:3
-    steps:
-      - attach_workspace:
-          at: /tmp
-      - checkout
-      - run:
-          name: Compress binaries
-          command: ls -p /tmp/lib | grep -v / | tar -cvf libfftw-$(cat VERSION)-linux32.tar.gz
-      - run:
-          name: Upload to GitHub
-          command: ./.circleci/github-upload.sh ./libfftw-$(cat VERSION)-linux.tar.gz
 workflows:
   version: 2
   build-test-deploy:
@@ -61,12 +51,3 @@ workflows:
       - test:
           requires:
             - build
-      - deploy:
-          requires:
-            - build
-            - test
-          filters:
-            tags:
-              only: /.*/
-            branches:
-              ignore: /.*/
