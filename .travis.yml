@@ -10,9 +10,6 @@ matrix:
     - os: osx
       env: ARCH="x86_64" JULIA_URL="https://julialangnightlies-s3.julialang.org/bin/osx/x64/julia-latest-osx.dmg"
       osx_image: xcode8
-branches:
-  only:
-    - master
 notifications:
   email: false
 before_script:
@@ -39,6 +36,7 @@ script:
       make;
     fi
   - julia test.jl
+before_deploy:
   - cd build/lib && ls -p | grep -v / | xargs tar -cvf ../../libfftw-$(cat VERSION)-$TRAVIS_OS_NAME-$ARCH.tar.gz
 deploy:
   provider: releases
@@ -46,6 +44,7 @@ deploy:
     secure: "$GH_API_TOKEN"
   file_glob: true
   file: "libfftw-*.tar.gz"
+  skip_cleanup: true
   on:
     repo: ararslan/fftw-builder
     tags: true
