@@ -17,7 +17,7 @@ jobs:
             TARBALL="libfftw-$(cat VERSION)-linux-i686.tar.gz"
             mkdir -p /tmp/zip
             cd build/lib
-            ls -p | grep -v / | xargs tar -cvf /tmp/zip/$TARBALL
+            ls -p | grep -v / | xargs tar -cvzf /tmp/zip/$TARBALL
       - store_artifacts:
           path: /tmp/zip
       - persist_to_workspace:
