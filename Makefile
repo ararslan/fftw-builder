@@ -46,6 +46,14 @@ FFTW_CONFIG += --with-incoming-stack-boundary=2
 endif
 endif
 
+ifneq ($(OS),Windows_NT)
+ifeq ($(shell uname),Darwin)
+CONFIG += LDFLAGS="-Wl,-rpath,'@loader_path/'"
+else
+CONFIG += LDFLAGS="-Wl,-rpath,'\$$\$$ORIGIN' -Wl,-z,origin"
+endif
+endif
+
 FFTW_ENABLE_single := --enable-single
 FFTW_ENABLE_double :=
 
