@@ -27,8 +27,11 @@ install:
 build_script:
   - C:\cygwin64\bin\sh -lc "make -C $(cygpath $APPVEYOR_BUILD_FOLDER)"
 after_build:
+  - mkdir %APPVEYOR_BUILD_FOLDER%\usr
+  - mkdir %APPVEYOR_BUILD_FOLDER%\usr\lib
+  - copy %APPVEYOR_BUILD_FOLDER\build\lib\*.dll %APPVEYOR_BUILD_FOLDER%\usr\lib
   - set /p VERSION= < %APPVEYOR_BUILD_FOLDER%\VERSION
-  - 7z a libfftw-%VERSION%-win-%ARCH%.zip %APPVEYOR_BUILD_FOLDER%\build\lib\*.dll
+  - 7z a libfftw-%VERSION%-win-%ARCH%.zip %APPVEYOR_BUILD_FOLDER%\usr
 before_test:
   - C:\projects\julia-binary.exe /S /D=C:\projects\julia
   - C:\projects\julia\bin\julia -e "versioninfo()"

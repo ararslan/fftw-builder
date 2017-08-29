@@ -10,18 +10,20 @@ jobs:
       - run:
           name: Build FFTW
           command: make
-      - run: cp -R build/lib /tmp
+      - run: mkdir /tmp/usr && cp -R build/lib /tmp/usr
       - run:
           name: Compress binaries
           command: |
             TARBALL="libfftw-$(cat VERSION)-linux-i686.tar.gz"
             mkdir -p /tmp/zip
-            cd build/lib
-            ls -p | grep -v / | xargs tar -cvzf /tmp/zip/$TARBALL
+            cd /tmp/usr/lib
+            ls -p | grep / | xargs rm -rf
+            cd /tmp
+            tar -cvzf /tmp/zip/$TARBALL usr
       - store_artifacts:
           path: /tmp/zip
       - persist_to_workspace:
-          root: /tmp
+          root: /tmp/usr
           paths:
             - lib
   test:
@@ -31,7 +33,7 @@ jobs:
           JULIA_URL: "https://julialangnightlies-s3.julialang.org/bin/linux/x86/julia-latest-linux32.tar.gz"
     steps:
       - attach_workspace:
-          at: /tmp
+          at: /tmp/usr
       - checkout
       - run:
           name: Install x86 Julia nightly
@@ -39,7 +41,7 @@ jobs:
             mkdir -p ~/julia
             curl -sL "${JULIA_URL}" | tar -C ~/julia -x -z --strip-components=1 -f -
             ~/julia/bin/julia -e 'versioninfo()'
-      - run: mkdir -p build/lib && cp /tmp/lib/*.* build/lib # test code assumes this location
+      - run: mkdir -p build/lib && cp /tmp/usr/lib/*.* build/lib # test code assumes this location
       - run:
           name: Run tests
           command: ~/julia/bin/julia test.jl

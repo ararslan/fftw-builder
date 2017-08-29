@@ -37,8 +37,9 @@ script:
     fi
   - julia test.jl
 before_deploy:
-  - (cd build/lib; tar -cvzf libfftw-$(cat ../../VERSION)-$TRAVIS_OS_NAME-$ARCH.tar.gz ./*.*)
-  - if [ -z "$(ls $TRAVIS_BUILD_DIR/build/lib/libfftw-*.tar.gz)" ]; then exit 1; fi
+  - mv build/lib usr/lib
+  - tar -cvzf libfftw-$(cat VERSION)-$TRAVIS_OS_NAME-$ARCH.tar.gz usr
+  - if [ -z "$(ls $TRAVIS_BUILD_DIR/libfftw-*.tar.gz)" ]; then exit 1; fi
 deploy:
   provider: releases
   api_key:
