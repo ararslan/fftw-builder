@@ -29,7 +29,7 @@ build_script:
 after_build:
   - mkdir %APPVEYOR_BUILD_FOLDER%\usr
   - mkdir %APPVEYOR_BUILD_FOLDER%\usr\lib
-  - copy %APPVEYOR_BUILD_FOLDER\build\lib\*.dll %APPVEYOR_BUILD_FOLDER%\usr\lib
+  - copy %APPVEYOR_BUILD_FOLDER%\build\lib\*.dll %APPVEYOR_BUILD_FOLDER%\usr\lib
   - set /p VERSION= < %APPVEYOR_BUILD_FOLDER%\VERSION
   - 7z a libfftw-%VERSION%-win-%ARCH%.zip %APPVEYOR_BUILD_FOLDER%\usr
 before_test:
