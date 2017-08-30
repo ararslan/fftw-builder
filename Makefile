@@ -15,6 +15,8 @@ SHLIB_EXT := so
 endif
 endif
 
+BASE_single := libfftw3f
+BASE_double := libfftw3
 TARGET_single := libfftw3f$(SUFFIX).$(SHLIB_EXT)
 TARGET_double := libfftw3$(SUFFIX).$(SHLIB_EXT)
 
@@ -74,6 +76,14 @@ $$(LIBDIR)/$$(TARGET_$1): $$(SRCDIR)/configure | $$(LIBDIR) $$(BINDIR)
 	$(MAKE) -C $$(dir $$<) install
 ifeq ($(OS),Windows_NT)
 	mv "$$(BINDIR)/$$(TARGET_$1)" "$$(LIBDIR)/$$(TARGET_$1)"
+else
+ifeq ($(shell uname),Darwin)
+	install_name_tool -id @rpath/$$(BASE_$1).$$(SHLIB_EXT) \
+	    $$(LIBDIR)/$$(BASE_$1).$$(SHLIB_EXT)
+	install_name_tool -id @rpath/$$(TARGET_$1) $$(LIBDIR)/$$(TARGET_$1)
+	install_name_tool -change $$(LIBDIR)/$$(BASE_$1).3.$$(SHLIB_EXT) \
+	    @rpath/$$(BASE_$1).$$(SHLIB_EXT) $$(LIBDIR)/$$(TARGET_$1)
+endif
 endif
 endef
 
