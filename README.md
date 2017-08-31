@@ -6,11 +6,6 @@ resulting binaries in releases.
 These binaries are intended to be used by [FFTW.jl](https://github.com/JuliaMath/FFTW.jl)
 and are thus built in a Julia-centric manner.
 
-At this point, this repository should _not_ be considered production-ready.
-If a tag containing binaries exists, DO NOT USE THEM as they may be literal garbage.
-
-Who doesn't love status badges?
-
 | OS  | Arch | Status |
 | :-- | :--: | :----: |
 | Linux, macOS | x86-64 | [![Travis](https://travis-ci.org/ararslan/fftw-builder.svg?branch=master)](https://travis-ci.org/ararslan/fftw-builder) |
